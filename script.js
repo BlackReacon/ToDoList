@@ -12,8 +12,10 @@
  //Add to do
  function addTodo() {
     text = todoInput.value;
-    generateHTML();
-    todoInput.value = '';
+    if (text.trim() !== '') { //No empty todo allowed, trimed string
+        generateHTML();
+        todoInput.value = '';
+    }
  }
 
  //Generate HTML
@@ -23,3 +25,9 @@
     <button class="b_delete">delete</button>
 </li>`
  }
+ // Event Delegation (besser für dynamische Elemente)
+todoList.addEventListener('click', function(e) {
+    if (e.target.classList.contains('b_delete')) {
+        e.target.parentElement.remove();
+    }
+});
