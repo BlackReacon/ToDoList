@@ -1,47 +1,59 @@
- //var
- let todoList = document.querySelector('#todo_list');
- let todoInput = document.querySelector('#in_todoName');
- let addButton = document.querySelector('#b_addTodo');
+//var
+let todoList = document.querySelector("#todo_list");
+let todoInput = document.querySelector("#in_todoName");
+let addButton = document.querySelector("#b_addTodo");
 
- let text = todoInput.value;
+let arrTask = ["go shopping", "do homework", "clean the kitchen"];
 
- //Event Listener
- addButton.addEventListener('click', addTodo);
+//Event Listener
+document.addEventListener('DOMContentLoaded', init);
 
-//Event Listener delete function 
-todoList.addEventListener('click', function(e) {
-    if (e.target.classList.contains('b_delete')) {
-        e.target.parentElement.remove();
-    }
+addButton.addEventListener("click", addTodo);
 
-    //change function
-    if (e.target.classList.contains('b_change')) {
-        text=prompt("Ok, change it!");
-        if (text.trim() !== ''){
-        e.target.parentElement.innerHTML = `
-    <span>${text}</span>
-    <button class="b_delete">delete</button>
-    <button class="b_change">change</button>`;
-        }
-    }
-});
+//Function
+function init() {
+    arrTask = JSON.parse(localStorage.getItem("tasks"));
+    generateTaskList();
+}
 
- //Function
- //Add to do
- function addTodo() {
-    text = todoInput.value;
-    if (text.trim() !== '') { //No empty todo allowed, trimed string
-        generateHTML();
-        todoInput.value = '';
-    }
- }
+//Add to do
+function addTodo() {
+  if (todoInput.value) {
+    arrTask.push(todoInput.value);
+    // console.log(arrTask);
+    generateTaskList();
+    todoInput.value = "";
+  }
+}
 
- //Generate HTML
- function generateHTML() {
+//Generate HTML
+function generateTaskList() {
+    todoList.innerHTML = "";
+  for (let index = 0 ; index < arrTask.length; index++) {
     todoList.innerHTML += `<li>
-    <span>${text}</span>
-    <button class="b_delete">delete</button>
-    <button class="b_change">change</button>
-</li>`
- }
+        <input id="editInput${index}" type=text value="${arrTask[index]}"></input>
+        <button onclick="deleteTask(${index})" class="b_delete">delete</button>
+        <button onclick="editTask(${index})" class="b_change">edit</button>
+    </li>`;
+  }
+  saveTask();
+}
 
+//Delete Task
+function deleteTask(tasknr) {
+arrTask.splice(tasknr,1);
+generateTaskList();
+}
+
+//Edit Task
+function editTask(tasknr) {
+    arrTask[tasknr]= document.querySelector('#editInput' + tasknr).value;
+    generateTaskList();
+}
+
+//Local storage set 
+function saveTask() {
+    let stringifiedTasks = JSON.stringify(arrTask);
+    localStorage.setItem("tasks", "");
+    localStorage.setItem("tasks", stringifiedTasks);
+}
