@@ -17,10 +17,12 @@ todoList.addEventListener('click', function(e) {
     //change function
     if (e.target.classList.contains('b_change')) {
         text=prompt("Ok, change it!");
+        if (text.trim() !== ''){
         e.target.parentElement.innerHTML = `
     <span>${text}</span>
     <button class="b_delete">delete</button>
     <button class="b_change">change</button>`;
+        }
     }
 });
 
