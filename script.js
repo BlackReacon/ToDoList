@@ -36,6 +36,7 @@ function generateTaskList() {
     todoList.innerHTML = "";
   for (let index = 0 ; index < arrTask.length; index++) {
     todoList.innerHTML += `<li>
+        <input type="checkbox" id="prioCheck${index}">
         <input id="editInput${index}" type=text value="${arrTask[index]}"></input>
         <button onclick="deleteTask(${index})" class="b_delete">delete</button>
         <button onclick="editTask(${index})" class="b_change">edit</button>
