@@ -3,21 +3,26 @@ let todoList = document.querySelector("#todo_list");
 let todoInput = document.querySelector("#in_todoName");
 let addButton = document.querySelector("#b_addTodo");
 
-let arrTask = ["go shopping", "do homework", "clean the kitchen"];
+let arrTask = [];
 
 //Event Listener
 document.addEventListener('DOMContentLoaded', init);
 
-addButton.addEventListener("click", addTodo);
+addButton.addEventListener("click",() => {addTodo(event)});
 
 //Function
+
 function init() {
+    if (localStorage.getItem("tasks")){
     arrTask = JSON.parse(localStorage.getItem("tasks"));
     generateTaskList();
+    }
 }
 
+
 //Add to do
-function addTodo() {
+function addTodo(event) {
+    event.preventDefault();
   if (todoInput.value) {
     arrTask.push(todoInput.value);
     // console.log(arrTask);
