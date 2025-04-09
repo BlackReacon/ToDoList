@@ -36,7 +36,7 @@ li {
     align-items: center;
 }
 
-#b_addTodo {
+#b_addTodo, .b_change {
     background: #4CAF50;
     border: none;
     padding: 6px 10px;
@@ -45,7 +45,7 @@ li {
     cursor: pointer;
 }
 
-#b_addTodo:hover {
+#b_addTodo:hover, .b_change:hover  {
     background: #45a049;
 }
 
