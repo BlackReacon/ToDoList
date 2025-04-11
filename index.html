@@ -1,25 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>ToDo List</title>
-</head>
-<body>
+  </head>
+  <body>
     <section id="hero">
-        <h1>My ToDo list</h1>
+      <h1>My ToDo list</h1>
     </section>
     <!-- menu - add new to do -->
+
+    <button id="b_registration">registration</button>
+    <div class="modal" id="registrat">
+      <div class="content">
+        <form id="registration">
+          <span class="close">&times;</span>
+          <input id="r_username" type="text" placeholder="username" />
+          <input id="r_email" type="text" placeholder="email" />
+          <input id="r_password" type="text" placeholder="password" />
+        </form>
+      </div>
+    </div>
+    <button id="b_login">login</button>
+    <div class="modal" id="signin">
+        <div class="content">
+          <form id="login">
+            <span class="close">&times;</span>
+            <input id="l_email" type="text" placeholder="email" />
+            <input id="l_password" type="text" placeholder="password" />
+          </form>
+        </div>
+      </div>
+
     <form id="menu">
-        <input type="text" id="in_todoName" placeholder="What is your to do?" required>
-        <button id="b_addTodo">confirm</button>
+      <input
+        type="text"
+        id="in_todoName"
+        placeholder="What is your to do?"
+        required
+      />
+      <button id="b_addTodo">confirm</button>
     </form>
     <!-- to do list -->
     <section id="mytodo">
-        <ul id="todo_list">   
-        </ul>
+      <ul id="todo_list"></ul>
     </section>
-</body>
-<script src="script.js"></script>
-</html> 
+  </body>
+  <script src="script.js"></script>
+</html>
