@@ -48,12 +48,13 @@ btn_l_ok.addEventListener("click", () => {
 
 //Function
 function init() {
-  if (localStorage.getItem("tasks")) {
+  /*   if (localStorage.getItem("tasks")) {                --------LocalStorage Task loading
     arrTask = JSON.parse(localStorage.getItem("tasks"));
     generateTaskList();
-  }
+  } */
   if (localStorage.getItem("token")) {
-   bearerToken = localStorage.getItem("token");
+    bearerToken = localStorage.getItem("token");
+    getTaskList();
   }
 }
 
@@ -67,7 +68,7 @@ function addTodo(event) {
   }
 } */
 
-//Generate HTML
+/* //Generate HTML                --------LocalStorage Task loading
 function generateTaskList() {
   todoList.innerHTML = "";
   for (let index = 0; index < arrTask.length; index++) {
@@ -79,7 +80,7 @@ function generateTaskList() {
     </li>`;
   }
   saveTask();
-}
+} */
 
 //Delete Task
 function deleteTask(tasknr) {
@@ -93,12 +94,12 @@ function editTask(tasknr) {
   generateTaskList();
 }
 
-//Local storage set
+/* //Local storage set
 function saveTask() {
   let stringifiedTasks = JSON.stringify(arrTask);
   localStorage.setItem("tasks", "");
   localStorage.setItem("tasks", stringifiedTasks);
-}
+} */
 
 //--------------------------------
 // When the user clicks on the button, open the modal
@@ -145,23 +146,23 @@ function register(event) {
 }
 /* --------------------------------- */
 
-function login(event){
+function login(event) {
   event.preventDefault();
-//API login post
-let api_login = {
-  email: l_email.value,
-  password: l_userpassword.value,
-};
-fetch("http://192.168.178.43:8000/api/login", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-  body: JSON.stringify(api_login),
-})
-  .then((response) => response.json())
-  .then((data) => safetoken(data));
+  //API login post
+  let api_login = {
+    email: l_email.value,
+    password: l_userpassword.value,
+  };
+  fetch("http://192.168.178.43:8000/api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(api_login),
+  })
+    .then((response) => response.json())
+    .then((data) => safetoken(data));
 }
 /* --------------------------------- */
 
@@ -183,51 +184,52 @@ function addTodo(event) {
   event.preventDefault();
   console.log(bearerToken);
   if (todoInput.value) {
-
     fetch("http://192.168.178.43:8000/api/todos", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        'Authorization': 'Bearer '+ bearerToken,
+        Authorization: "Bearer " + bearerToken,
       },
-      body: JSON.stringify({"titel" : todoInput.value}),
+      body: JSON.stringify({ titel: todoInput.value }),
     })
       .then((response) => response.json())
       .then((data) => console.log(data));
 
-    /* todoInput.value = ""; */
+    todoInput.value = "";
   }
 }
+/* --------------------------------- */
 
-/* 11|7D1tnNjXCqxmtcGKEtAV0AwcwQWFvhbuXxvlo8nZccfa2b05   BEARER*/
-/* const register = {
-  name: 'kartoffel',
-  password: 'kartoffel',
-  email: 'kartoffel@kartoffel.obst'
-} 
-const login = {
-  email: 'kartoffel@kartoffel.obst',
-  password: 'kartoffel',
-}*/
+function getTaskList() {
+  fetch("http://192.168.178.43:8000/api/todos", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + bearerToken,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => generateTaskList(data));
+}
 
-/*  fetch('http://192.168.178.43:8000/api/todos', {
-  method: 'GET',
-  headers:{
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer 11|7D1tnNjXCqxmtcGKEtAV0AwcwQWFvhbuXxvlo8nZccfa2b05'
-  }
- })
-  .then(response => response.json())
-  .then(data => console.log(data));
+function generateTaskList(task) {
+  todoList.innerHTML = "";
+  console.log(task);
 
-  let token = blabla
+  task.data.forEach((element) => {
+    todoList.innerHTML += `<li>
+  <input type="checkbox" id="prioCheck${element.id}">
+  <input id="editInput${element.id}" type=text value="${element.titel}"></input>
+  <button onclick="deleteTask(${element.id})" class="b_delete">delete</button>
+  <button onclick="editTask(${element.id})" class="b_change">edit</button>
+</li>`;
+  });
+}
 
-  function register
-  function login
-  function todo abrufen
-  function todo schreiben
+/* 
   function todo ebarbeiten
   function prio 
-  function todo löschen */
+  function todo löschen
+ */
