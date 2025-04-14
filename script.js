@@ -40,7 +40,11 @@ addButton.addEventListener("click", () => {
 //Event Listener modal ok button
 btn_r_ok.addEventListener("click", () => {
   register(event);
-}); 
+});
+
+btn_l_ok.addEventListener("click", () => {
+  login(event);
+});
 
 //Function
 function init() {
@@ -96,59 +100,78 @@ function saveTask() {
 
 //--------------------------------
 // When the user clicks on the button, open the modal
-btn_registration.onclick = function() {
-    modal_registration.style.display = "block";
-}
-btn_login.onclick = function() {
-    modal_login.style.display = "block";
-}
+btn_registration.onclick = function () {
+  modal_registration.style.display = "block";
+};
+btn_login.onclick = function () {
+  modal_login.style.display = "block";
+};
 
 // When the user clicks on <span> (x), close the modal
- span.onclick = function() {
-    modal_registration.style.display = "none";
-    modal_login.style.display = "none";
- }
+span.onclick = function () {
+  modal_registration.style.display = "none";
+  modal_login.style.display = "none";
+};
 
- // When the user clicks anywhere outside of the modal, close it
- window.onclick = function(event) {
-   if (event.target == modal_registration || event.target == modal_login) {
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function (event) {
+  if (event.target == modal_registration || event.target == modal_login) {
     modal_registration.style.display = "none";
     modal_login.style.display = "none";
-   }
- }
+  }
+};
 /* --------------------------------- */
 
 function register(event) {
   event.preventDefault();
-//Api register post
-let api_register = {
-  name: r_username.value,
-  email: r_email.value,
-  password: r_userpassword.value
-}
-  fetch('http://192.168.178.43:8000/api/register', {
-    method: 'POST',
+  //Api register post
+  let api_register = {
+    name: r_username.value,
+    email: r_email.value,
+    password: r_userpassword.value,
+  };
+  fetch("http://192.168.178.43:8000/api/register", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
-    body: JSON.stringify(api_register)
+    body: JSON.stringify(api_register),
   })
-  .then(response => response.json())
-  .then(data => notification(data));
+    .then((response) => response.json())
+    .then((data) => notification(data));
 }
 
-function notification(msg){
+function notification(msg) {
   alert("Message from God:" + JSON.stringify(msg.nachricht));
   modal_registration.style.display = "none";
 }
+/* --------------------------------- */
 
+function login(event){
+  event.preventDefault();
 //API login post
 let api_login = {
   email: l_email.value,
-  password: l_userpassword.value
+  password: l_userpassword.value,
+};
+fetch("http://192.168.178.43:8000/api/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+  body: JSON.stringify(api_login),
+})
+  .then((response) => response.json())
+  .then((data) => safetoken(data));
 }
 
+function safetoken(token) {
+  bearerToken = token;
+  alert("Loged in");
+  modal_login.style.display = "none";
+}
 
 /* 11|7D1tnNjXCqxmtcGKEtAV0AwcwQWFvhbuXxvlo8nZccfa2b05   BEARER*/
 /* const register = {
@@ -160,7 +183,6 @@ const login = {
   email: 'kartoffel@kartoffel.obst',
   password: 'kartoffel',
 }*/
-
 
 /*  fetch('http://192.168.178.43:8000/api/todos', {
   method: 'GET',
