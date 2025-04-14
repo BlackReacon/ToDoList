@@ -102,3 +102,11 @@ li {
   text-decoration: none;
   cursor: pointer;
 }
+
+
+#notyBar{
+  width:100%;
+  height: 20px;
+  font-weight: bold;
+  text-align: center;
+}

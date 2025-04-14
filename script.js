@@ -4,7 +4,6 @@ let todoInput = document.querySelector("#in_todoName");
 let addButton = document.querySelector("#b_addTodo");
 let btn_logout = document.querySelector("#b_logout");
 
-
 // Get the modal
 let modal_registration = document.getElementById("registrat");
 let modal_login = document.getElementById("signin");
@@ -149,18 +148,31 @@ function register(event) {
   fetch("http://192.168.178.43:8000/api/register", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
+        "Content-Type": "application/json",
+        Accept: "application/json",
     },
     body: JSON.stringify(api_register),
-  })
-    .then((response) => response.json())
-    .then((data) => notification(data));
+})
+.then(response => {
+    if (!response.ok) {
+        return response.json().then(err => {
+            throw err;
+        });
+    }
+    return response.json();
+})
+.then((data) => notification(data))
+.catch((err) => notify(err.message, "critical"));
+l_email.value = r_email.value;
+l_userpassword.value = r_userpassword.value;
 }
 /* --------------------------------- */
 
 function login(event) {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  } else {
+  
   //API login post
   let api_login = {
     email: l_email.value,
@@ -176,12 +188,13 @@ function login(event) {
   })
     .then((response) => response.json())
     .then((data) => safetoken(data));
-}
+}}
 /* --------------------------------- */
 
 function notification(msg) {
   alert("Message from God:" + JSON.stringify(msg.nachricht));
   modal_registration.style.display = "none";
+  login();
 }
 
 function safetoken(token) {
@@ -304,4 +317,28 @@ function togglePrio(tasknr) {
   console.log("prio check");
 
   getTaskList();
+}
+
+
+
+
+
+
+function notify(msg, state){
+  console.log(msg);
+
+  if(state == "warn"){
+    document.getElementById('notyBar').innerHTML = "";
+    document.getElementById('notyBar').innerHTML = `<div style='color:white; background-color:orange'>Fehler:
+    ${msg}</div>`
+  } else if(state == "critical"){
+    document.getElementById('notyBar').innerHTML = "";
+    document.getElementById('notyBar').innerHTML = `<div style='color:white; background-color:red'>Fehler:
+    ${msg}</div>`
+  } else if(state == "info"){
+    document.getElementById('notyBar').innerHTML = "";
+    document.getElementById('notyBar').innerHTML = `<div style='color:black; background-color:yellow'>Fehler:
+    ${msg}</div>`
+  }
+  
 }
