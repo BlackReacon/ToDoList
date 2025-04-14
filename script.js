@@ -52,18 +52,20 @@ function init() {
     arrTask = JSON.parse(localStorage.getItem("tasks"));
     generateTaskList();
   }
+  if (localStorage.getItem("token")) {
+   bearerToken = localStorage.getItem("token");
+  }
 }
 
-//Add to do
+/* LocalStorage--------------//Add to do
 function addTodo(event) {
   event.preventDefault();
   if (todoInput.value) {
     arrTask.push(todoInput.value);
-    // console.log(arrTask);
     generateTaskList();
     todoInput.value = "";
   }
-}
+} */
 
 //Generate HTML
 function generateTaskList() {
@@ -141,11 +143,6 @@ function register(event) {
     .then((response) => response.json())
     .then((data) => notification(data));
 }
-
-function notification(msg) {
-  alert("Message from God:" + JSON.stringify(msg.nachricht));
-  modal_registration.style.display = "none";
-}
 /* --------------------------------- */
 
 function login(event){
@@ -166,11 +163,41 @@ fetch("http://192.168.178.43:8000/api/login", {
   .then((response) => response.json())
   .then((data) => safetoken(data));
 }
+/* --------------------------------- */
+
+function notification(msg) {
+  alert("Message from God:" + JSON.stringify(msg.nachricht));
+  modal_registration.style.display = "none";
+}
 
 function safetoken(token) {
-  bearerToken = token;
+  bearerToken = token.token;
   alert("Loged in");
   modal_login.style.display = "none";
+  console.log(bearerToken);
+  localStorage.setItem("token", bearerToken);
+}
+/* --------------------------------- */
+
+function addTodo(event) {
+  event.preventDefault();
+  console.log(bearerToken);
+  if (todoInput.value) {
+
+    fetch("http://192.168.178.43:8000/api/todos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        'Authorization': 'Bearer '+ bearerToken,
+      },
+      body: JSON.stringify({"titel" : todoInput.value}),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+
+    /* todoInput.value = ""; */
+  }
 }
 
 /* 11|7D1tnNjXCqxmtcGKEtAV0AwcwQWFvhbuXxvlo8nZccfa2b05   BEARER*/
