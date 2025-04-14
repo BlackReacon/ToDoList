@@ -4,6 +4,7 @@ let todoInput = document.querySelector("#in_todoName");
 let addButton = document.querySelector("#b_addTodo");
 let btn_logout = document.querySelector("#b_logout");
 
+
 // Get the modal
 let modal_registration = document.getElementById("registrat");
 let modal_login = document.getElementById("signin");
@@ -66,6 +67,7 @@ function logout() {
   localStorage.setItem("token", "");
   alert("Log out complete");
   getTaskList();
+  todoList.innerHTML = "";
 }
 
 /* LocalStorage--------------//Add to do
@@ -136,6 +138,7 @@ window.onclick = function (event) {
 /* --------------------------------- */
 
 function register(event) {
+  todoList.innerHTML = "";
   event.preventDefault();
   //Api register post
   let api_register = {
@@ -187,6 +190,7 @@ function safetoken(token) {
   modal_login.style.display = "none";
   console.log(bearerToken);
   localStorage.setItem("token", bearerToken);
+  getTaskList();
 }
 /* --------------------------------- */
 
@@ -246,12 +250,20 @@ function generateTaskList(tasks) {
   console.log(tasks);
 
   tasks.data.forEach((task) => {
-    todoList.innerHTML += `<li>
-  <input type="checkbox" id="prioCheck${task.id}">
-  <input id="editInput${task.id}" type=text value="${task.titel}"></input>
+    console.log(task.prio);
+    if (task.prio == 1) {
+      todoList.innerHTML += `<li><input type="checkbox" name="prioCheck${task.id}" id="prioCheck${task.id}" onClick="togglePrio(${task.id})" checked>
+        <input id="editInput${task.id}" type=text value="${task.titel}"></input>
   <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
   <button onclick="editTask(${task.id})" class="b_change">edit</button>
 </li>`;
+    } else {
+      todoList.innerHTML += `<li><input type="checkbox" name="prioCheck${task.id}" onClick="togglePrio(${task.id})" id="prioCheck${task.id}">
+        <input id="editInput${task.id}" type=text value="${task.titel}"></input>
+  <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
+  <button onclick="editTask(${task.id})" class="b_change">edit</button>
+</li>`;
+    }
   });
 }
 /* --------------------------------- */
@@ -264,10 +276,32 @@ function editTask(tasknr) {
       Accept: "application/json",
       Authorization: "Bearer " + bearerToken,
     },
-    body: JSON.stringify({ titel: document.querySelector("#editInput" + tasknr).value}),
+    body: JSON.stringify({
+      titel: document.querySelector("#editInput" + tasknr).value,
+    }),
   })
     .then((response) => response.json())
     .then((data) => console.log(data));
+
+  getTaskList();
+}
+/* --------------------------------- */
+
+function togglePrio(tasknr) {
+  fetch(`http://192.168.178.43:8000/api/todos/${tasknr}/toggle`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + bearerToken,
+    },
+    body: JSON.stringify({
+      prio: document.querySelector("#prioCheck" + tasknr).checked,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data));
+  console.log("prio check");
 
   getTaskList();
 }
