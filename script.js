@@ -2,6 +2,7 @@
 let todoList = document.querySelector("#todo_list");
 let todoInput = document.querySelector("#in_todoName");
 let addButton = document.querySelector("#b_addTodo");
+let btn_logout = document.querySelector("#b_logout");
 
 // Get the modal
 let modal_registration = document.getElementById("registrat");
@@ -44,7 +45,10 @@ btn_r_ok.addEventListener("click", () => {
 
 btn_l_ok.addEventListener("click", () => {
   login(event);
+  getTaskList();
 });
+
+btn_logout.addEventListener("click", logout);
 
 //Function
 function init() {
@@ -56,6 +60,12 @@ function init() {
     bearerToken = localStorage.getItem("token");
     getTaskList();
   }
+}
+
+function logout() {
+  localStorage.setItem("token", "");
+  alert("Log out complete");
+  getTaskList();
 }
 
 /* LocalStorage--------------//Add to do
@@ -88,11 +98,11 @@ function deleteTask(tasknr) {
   generateTaskList();
 } */
 
-//Edit Task
+/* //Edit Task                    --------LocalStorage Edit Task
 function editTask(tasknr) {
   arrTask[tasknr] = document.querySelector("#editInput" + tasknr).value;
   generateTaskList();
-}
+} */
 
 /* //Local storage set
 function saveTask() {
@@ -226,8 +236,8 @@ function deleteTask(tasknr) {
   })
     .then((response) => response.json())
     .then((data) => console.log(data));
-  
-    getTaskList();
+
+  getTaskList();
 }
 /* --------------------------------- */
 
@@ -242,5 +252,22 @@ function generateTaskList(tasks) {
   <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
   <button onclick="editTask(${task.id})" class="b_change">edit</button>
 </li>`;
-  }); 
+  });
+}
+/* --------------------------------- */
+
+function editTask(tasknr) {
+  fetch("http://192.168.178.43:8000/api/todos/" + tasknr, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + bearerToken,
+    },
+    body: JSON.stringify({ titel: document.querySelector("#editInput" + tasknr).value}),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data));
+
+  getTaskList();
 }
