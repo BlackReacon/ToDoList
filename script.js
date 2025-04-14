@@ -82,11 +82,11 @@ function generateTaskList() {
   saveTask();
 } */
 
-//Delete Task
+/* //Delete Task                  --------LocalStorage Delete Task
 function deleteTask(tasknr) {
   arrTask.splice(tasknr, 1);
   generateTaskList();
-}
+} */
 
 //Edit Task
 function editTask(tasknr) {
@@ -194,7 +194,7 @@ function addTodo(event) {
       body: JSON.stringify({ titel: todoInput.value }),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data));
+      .then((data) => getTaskList(data));
 
     todoInput.value = "";
   }
@@ -213,23 +213,34 @@ function getTaskList() {
     .then((response) => response.json())
     .then((data) => generateTaskList(data));
 }
+/* --------------------------------- */
 
-function generateTaskList(task) {
-  todoList.innerHTML = "";
-  console.log(task);
-
-  task.data.forEach((element) => {
-    todoList.innerHTML += `<li>
-  <input type="checkbox" id="prioCheck${element.id}">
-  <input id="editInput${element.id}" type=text value="${element.titel}"></input>
-  <button onclick="deleteTask(${element.id})" class="b_delete">delete</button>
-  <button onclick="editTask(${element.id})" class="b_change">edit</button>
-</li>`;
-  });
+function deleteTask(tasknr) {
+  fetch("http://192.168.178.43:8000/api/todos/" + tasknr, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + bearerToken,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data));
+  
+    getTaskList();
 }
+/* --------------------------------- */
 
-/* 
-  function todo ebarbeiten
-  function prio 
-  function todo löschen
- */
+function generateTaskList(tasks) {
+  todoList.innerHTML = "";
+  console.log(tasks);
+
+  tasks.data.forEach((task) => {
+    todoList.innerHTML += `<li>
+  <input type="checkbox" id="prioCheck${task.id}">
+  <input id="editInput${task.id}" type=text value="${task.titel}"></input>
+  <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
+  <button onclick="editTask(${task.id})" class="b_change">edit</button>
+</li>`;
+  }); 
+}
