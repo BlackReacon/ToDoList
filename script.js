@@ -1,5 +1,6 @@
 //var
 let todoList = document.querySelector("#todo_list");
+let todoArchive = document.querySelector("#todo_archive");
 let todoInput = document.querySelector("#in_todoName");
 let addButton = document.querySelector("#b_addTodo");
 let btn_logout = document.querySelector("#b_logout");
@@ -45,7 +46,6 @@ btn_r_ok.addEventListener("click", () => {
 
 btn_l_ok.addEventListener("click", () => {
   login(event);
-  getTaskList();
 });
 
 btn_logout.addEventListener("click", logout);
@@ -65,7 +65,6 @@ function init() {
 function logout() {
   localStorage.setItem("token", "");
   alert("Log out complete");
-  getTaskList();
   todoList.innerHTML = "";
 }
 
@@ -171,6 +170,21 @@ l_userpassword.value = r_userpassword.value;
 function login(event) {
   if (event) {
     event.preventDefault();
+    //API login post
+  let api_login = {
+    email: l_email.value,
+    password: l_userpassword.value,
+  };
+  fetch("http://192.168.178.43:8000/api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(api_login),
+  })
+    .then((response) => response.json())
+    .then((data) => safetoken(data));
   } else {
   
   //API login post
@@ -260,22 +274,33 @@ function deleteTask(tasknr) {
 
 function generateTaskList(tasks) {
   todoList.innerHTML = "";
+  todoArchive.innerHTML = "";
   console.log(tasks);
 
   tasks.data.forEach((task) => {
     console.log(task.prio);
-    if (task.prio == 1) {
+    if (task.prio == 1 && task.archiviert == 0) {
       todoList.innerHTML += `<li><input type="checkbox" name="prioCheck${task.id}" id="prioCheck${task.id}" onClick="togglePrio(${task.id})" checked>
-        <input id="editInput${task.id}" type=text value="${task.titel}"></input>
+        <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
   <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
   <button onclick="editTask(${task.id})" class="b_change">edit</button>
+  <button onclick="archive(${task.id})" class="b_archive">archive</button>
 </li>`;
-    } else {
+    } else if (task.prio == 0 && task.archiviert == 0) {
       todoList.innerHTML += `<li><input type="checkbox" name="prioCheck${task.id}" onClick="togglePrio(${task.id})" id="prioCheck${task.id}">
-        <input id="editInput${task.id}" type=text value="${task.titel}"></input>
+        <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
   <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
   <button onclick="editTask(${task.id})" class="b_change">edit</button>
+  <button onclick="archive(${task.id})" class="b_archive">archive</button>
 </li>`;
+    }
+    else {
+      todoArchive.innerHTML += `<li>
+      <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
+<button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
+<button onclick="editTask(${task.id})" class="b_change">edit</button>
+<button onclick="archive(${task.id})" class="b_archive">archive</button>
+</li>`
     }
   });
 }
@@ -318,7 +343,23 @@ function togglePrio(tasknr) {
 
   getTaskList();
 }
+/* --------------------------------- */
 
+function archive(tasknr) {
+  fetch(`http://192.168.178.43:8000/api/todos/${tasknr}/archive`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + bearerToken,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data));
+  console.log("archiviert"+ tasknr);
+
+  getTaskList();
+}
 
 
 
