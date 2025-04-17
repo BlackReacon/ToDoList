@@ -4,6 +4,8 @@ let todoArchive = document.querySelector("#todo_archive");
 let todoInput = document.querySelector("#in_todoName");
 let addButton = document.querySelector("#b_addTodo");
 let btn_logout = document.querySelector("#b_logout");
+let currenTaskId = null;
+let oldParentid = null;
 
 // Get the modal
 let modal_registration = document.getElementById("registrat");
@@ -147,23 +149,23 @@ function register(event) {
   fetch("http://192.168.178.43:8000/api/register", {
     method: "POST",
     headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify(api_register),
-})
-.then(response => {
-    if (!response.ok) {
-        return response.json().then(err => {
-            throw err;
+  })
+    .then((response) => {
+      if (!response.ok) {
+        return response.json().then((err) => {
+          throw err;
         });
-    }
-    return response.json();
-})
-.then((data) => notification(data))
-.catch((err) => notify(err.message, "critical"));
-l_email.value = r_email.value;
-l_userpassword.value = r_userpassword.value;
+      }
+      return response.json();
+    })
+    .then((data) => notification(data))
+    .catch((err) => notify(err.message, "critical"));
+  l_email.value = r_email.value;
+  l_userpassword.value = r_userpassword.value;
 }
 /* --------------------------------- */
 
@@ -171,38 +173,38 @@ function login(event) {
   if (event) {
     event.preventDefault();
     //API login post
-  let api_login = {
-    email: l_email.value,
-    password: l_userpassword.value,
-  };
-  fetch("http://192.168.178.43:8000/api/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(api_login),
-  })
-    .then((response) => response.json())
-    .then((data) => safetoken(data));
+    let api_login = {
+      email: l_email.value,
+      password: l_userpassword.value,
+    };
+    fetch("http://192.168.178.43:8000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(api_login),
+    })
+      .then((response) => response.json())
+      .then((data) => safetoken(data));
   } else {
-  
-  //API login post
-  let api_login = {
-    email: l_email.value,
-    password: l_userpassword.value,
-  };
-  fetch("http://192.168.178.43:8000/api/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(api_login),
-  })
-    .then((response) => response.json())
-    .then((data) => safetoken(data));
-}}
+    //API login post
+    let api_login = {
+      email: l_email.value,
+      password: l_userpassword.value,
+    };
+    fetch("http://192.168.178.43:8000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(api_login),
+    })
+      .then((response) => response.json())
+      .then((data) => safetoken(data));
+  }
+}
 /* --------------------------------- */
 
 function notification(msg) {
@@ -280,31 +282,107 @@ function generateTaskList(tasks) {
   tasks.data.forEach((task) => {
     console.log(task.prio);
     if (task.prio == 1 && task.archiviert == 0) {
-      todoList.innerHTML += `<li><input type="checkbox" name="prioCheck${task.id}" id="prioCheck${task.id}" onClick="togglePrio(${task.id})" checked>
+      todoList.innerHTML += `<li class="item" draggable="true" id="li${task.id}"><input type="checkbox" name="prioCheck${task.id}" id="prioCheck${task.id}" onClick="togglePrio(${task.id})" checked>
         <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
-  <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
-  <button onclick="editTask(${task.id})" class="b_change">edit</button>
-  <button onclick="archive(${task.id})" class="b_archive">archive</button>
-</li>`;
+        <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
+        <button onclick="editTask(${task.id})" class="b_change">edit</button>
+        <button onclick="archive(${task.id})" class="b_archive">archive</button>
+      </li>`;
     } else if (task.prio == 0 && task.archiviert == 0) {
-      todoList.innerHTML += `<li><input type="checkbox" name="prioCheck${task.id}" onClick="togglePrio(${task.id})" id="prioCheck${task.id}">
+      todoList.innerHTML += `<li class="item" draggable="true" id="li${task.id}"><input type="checkbox" name="prioCheck${task.id}" onClick="togglePrio(${task.id})" id="prioCheck${task.id}">
         <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
-  <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
-  <button onclick="editTask(${task.id})" class="b_change">edit</button>
-  <button onclick="archive(${task.id})" class="b_archive">archive</button>
-</li>`;
-    }
-    else {
-      todoArchive.innerHTML += `<li>
+        <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
+        <button onclick="editTask(${task.id})" class="b_change">edit</button>
+        <button onclick="archive(${task.id})" class="b_archive">archive</button>
+      </li>`;
+    } else {
+      todoArchive.innerHTML += `<li class="item" draggable="true" id="li${task.id}">
       <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
-<button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
-<button onclick="editTask(${task.id})" class="b_change">edit</button>
-<button onclick="archive(${task.id})" class="b_archive">archive</button>
-</li>`
+      <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
+      <button onclick="editTask(${task.id})" class="b_change">edit</button>
+      <button onclick="archive(${task.id})" class="b_archive">archive</button>
+      </li>`;
     }
+  });
+  tasks.data.forEach((aufgabe) => {
+    generateEventlistener(aufgabe.id);
   });
 }
 /* --------------------------------- */
+
+function generateEventlistener(taskId) {
+  document
+    .querySelector("#li" + taskId)
+    .addEventListener("dragstart", (event) => {
+      document.getElementById("li"+taskId).classList.add("wobble");
+      startDrag(taskId);
+      console.log("Ich bin die TaskId" + taskId);
+
+
+      oldParentid = document.getElementById("li"+taskId).parentElement.id;
+      console.log("old parent:" + oldParentid);
+    });
+}
+
+function startDrag(taskId) {
+  console.log("Start Drag" + taskId);
+  currenTaskId = taskId;
+}
+
+todoArchive.addEventListener("dragover", function (event) {
+  event.preventDefault();
+  console.log("wir ziehen grad die id" + currenTaskId + "Über Archive");
+});
+
+todoList.addEventListener("dragover", function (event) {
+  event.preventDefault();
+  console.log("wir ziehen gerade über Todo bzw now mit der id " + currenTaskId);
+})
+
+todoArchive.addEventListener("drop", function (event) {
+  event.preventDefault();
+  if (currenTaskId !== null){
+    console.log("neuer old parent" + oldParentid)
+    if (oldParentid == "todo_archive"){
+      console.log("NÖ!!");
+      document.getElementById("li"+currenTaskId).classList.remove("wobble");
+    }else{
+    archive(currenTaskId);
+    console.log(event.currentTarget.id);
+    console.log("Archiviert mit der id nummer" + currenTaskId);
+    document.getElementById("li"+currenTaskId).classList.remove("wobble");
+    };
+
+  } else {
+    console.log("die Taskid ist aktuell null");
+    document.getElementById("li"+currenTaskId).classList.remove("wobble");
+  };
+});
+
+todoList.addEventListener("drop", function(event){
+  event.preventDefault();
+  if (currenTaskId !== null) {
+    if(oldParentid == "todo_list"){
+      console.log("NÖ!!");
+      document.getElementById("li"+currenTaskId).classList.remove("wobble");
+    }else{
+          archive(currenTaskId);
+    console.log(event.currentTarget.id);
+    console.log("Task wiederhergestellt mit der id " + currenTaskId);
+    document.getElementById("li"+currenTaskId).classList.remove("wobble");
+    }
+
+  } else{
+    console.log("Taskid ist nicht gleich null");
+    document.getElementById("li"+currenTaskId).classList.remove("wobble");
+  };
+});
+/* function DropTask(taskId){
+  todoArchive.addEventListener("drop", function(event){
+    event.preventDefault();
+archive(taskId);
+  })
+} */
 
 function editTask(tasknr) {
   fetch("http://192.168.178.43:8000/api/todos/" + tasknr, {
@@ -356,30 +434,32 @@ function archive(tasknr) {
   })
     .then((response) => response.json())
     .then((data) => console.log(data));
-  console.log("archiviert"+ tasknr);
-
+  console.log("archiviert" + tasknr);
+  tasknr = 0;
   getTaskList();
 }
 
-
-
-
-
-function notify(msg, state){
+function notify(msg, state) {
   console.log(msg);
 
-  if(state == "warn"){
-    document.getElementById('notyBar').innerHTML = "";
-    document.getElementById('notyBar').innerHTML = `<div style='color:white; background-color:orange'>Fehler:
-    ${msg}</div>`
-  } else if(state == "critical"){
-    document.getElementById('notyBar').innerHTML = "";
-    document.getElementById('notyBar').innerHTML = `<div style='color:white; background-color:red'>Fehler:
-    ${msg}</div>`
-  } else if(state == "info"){
-    document.getElementById('notyBar').innerHTML = "";
-    document.getElementById('notyBar').innerHTML = `<div style='color:black; background-color:yellow'>Fehler:
-    ${msg}</div>`
+  if (state == "warn") {
+    document.getElementById("notyBar").innerHTML = "";
+    document.getElementById(
+      "notyBar"
+    ).innerHTML = `<div style='color:white; background-color:orange'>Fehler:
+    ${msg}</div>`;
+  } else if (state == "critical") {
+    document.getElementById("notyBar").innerHTML = "";
+    document.getElementById(
+      "notyBar"
+    ).innerHTML = `<div style='color:white; background-color:red'>Fehler:
+    ${msg}</div>`;
+  } else if (state == "info") {
+    document.getElementById("notyBar").innerHTML = "";
+    document.getElementById(
+      "notyBar"
+    ).innerHTML = `<div style='color:black; background-color:yellow'>Fehler:
+    ${msg}</div>`;
   }
-  
 }
+/* --------------------------------- */
