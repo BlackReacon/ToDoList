@@ -6,6 +6,11 @@ let addButton = document.querySelector("#b_addTodo");
 let btn_logout = document.querySelector("#b_logout");
 let currenTaskId = null;
 let oldParentid = null;
+let autologin = true;
+
+//css beer var
+let h_navbar = document.querySelector(".h_navbar");
+let snackbar = document.querySelector("#notyBar");
 
 // Get the modal
 let modal_registration = document.getElementById("registrat");
@@ -54,10 +59,6 @@ btn_logout.addEventListener("click", logout);
 
 //Function
 function init() {
-  /*   if (localStorage.getItem("tasks")) {                --------LocalStorage Task loading
-    arrTask = JSON.parse(localStorage.getItem("tasks"));
-    generateTaskList();
-  } */
   if (localStorage.getItem("token")) {
     bearerToken = localStorage.getItem("token");
     getTaskList();
@@ -66,76 +67,11 @@ function init() {
 
 function logout() {
   localStorage.setItem("token", "");
-  alert("Log out complete");
+  notify("successfully logged out", "info");
   todoList.innerHTML = "";
 }
 
-/* LocalStorage--------------//Add to do
-function addTodo(event) {
-  event.preventDefault();
-  if (todoInput.value) {
-    arrTask.push(todoInput.value);
-    generateTaskList();
-    todoInput.value = "";
-  }
-} */
-
-/* //Generate HTML                --------LocalStorage Task loading
-function generateTaskList() {
-  todoList.innerHTML = "";
-  for (let index = 0; index < arrTask.length; index++) {
-    todoList.innerHTML += `<li>
-        <input type="checkbox" id="prioCheck${index}">
-        <input id="editInput${index}" type=text value="${arrTask[index]}"></input>
-        <button onclick="deleteTask(${index})" class="b_delete">delete</button>
-        <button onclick="editTask(${index})" class="b_change">edit</button>
-    </li>`;
-  }
-  saveTask();
-} */
-
-/* //Delete Task                  --------LocalStorage Delete Task
-function deleteTask(tasknr) {
-  arrTask.splice(tasknr, 1);
-  generateTaskList();
-} */
-
-/* //Edit Task                    --------LocalStorage Edit Task
-function editTask(tasknr) {
-  arrTask[tasknr] = document.querySelector("#editInput" + tasknr).value;
-  generateTaskList();
-} */
-
-/* //Local storage set
-function saveTask() {
-  let stringifiedTasks = JSON.stringify(arrTask);
-  localStorage.setItem("tasks", "");
-  localStorage.setItem("tasks", stringifiedTasks);
-} */
-
 //--------------------------------
-// When the user clicks on the button, open the modal
-btn_registration.onclick = function () {
-  modal_registration.style.display = "block";
-};
-btn_login.onclick = function () {
-  modal_login.style.display = "block";
-};
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function () {
-  modal_registration.style.display = "none";
-  modal_login.style.display = "none";
-};
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function (event) {
-  if (event.target == modal_registration || event.target == modal_login) {
-    modal_registration.style.display = "none";
-    modal_login.style.display = "none";
-  }
-};
-/* --------------------------------- */
 
 function register(event) {
   todoList.innerHTML = "";
@@ -166,6 +102,7 @@ function register(event) {
     .catch((err) => notify(err.message, "critical"));
   l_email.value = r_email.value;
   l_userpassword.value = r_userpassword.value;
+  notify("successfully sign in", "info");
 }
 /* --------------------------------- */
 
@@ -208,17 +145,23 @@ function login(event) {
 /* --------------------------------- */
 
 function notification(msg) {
-  alert("Message from God:" + JSON.stringify(msg.nachricht));
-  modal_registration.style.display = "none";
+  // alert("Message from God:" + JSON.stringify(msg.nachricht));
+  hidden_sidebar("#regist");
+  hidden_sidebar("#reg_dialog");
+  autologin = false;
   login();
 }
 
 function safetoken(token) {
   bearerToken = token.token;
-  alert("Loged in");
-  modal_login.style.display = "none";
-  console.log(bearerToken);
   localStorage.setItem("token", bearerToken);
+
+  if (autologin) {
+    hidden_sidebar("#signin");
+    hidden_sidebar("#log_dialog");
+  }
+  autologin = true;
+  notify("successfully logged in", "info");
   getTaskList();
 }
 /* --------------------------------- */
@@ -282,26 +225,49 @@ function generateTaskList(tasks) {
   tasks.data.forEach((task) => {
     console.log(task.prio);
     if (task.prio == 1 && task.archiviert == 0) {
-      todoList.innerHTML += `<li class="item" draggable="true" id="li${task.id}"><input type="checkbox" name="prioCheck${task.id}" id="prioCheck${task.id}" onClick="togglePrio(${task.id})" checked>
-        <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
-        <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
-        <button onclick="editTask(${task.id})" class="b_change">edit</button>
-        <button onclick="archive(${task.id})" class="b_archive">archive</button>
-      </li>`;
+      todoList.innerHTML += `
+      <article class="item border" draggable="true" id="li${task.id}">
+          <div class="field">
+            <input id="editInput${task.id}" type="text" value="${task.titel}" class="large" style="font-size: 2rem !important"></input>
+          </div>
+        <label class="checkbox icon">
+          <input type="checkbox" name="prioCheck${task.id}" id="prioCheck${task.id}" onClick="togglePrio(${task.id})" checked>
+            <span>
+              <i>trending_up</i>
+              <i>trending_down</i>
+            </span>
+        </label>
+          <button onclick="deleteTask(${task.id})" class="b_delete"><i>delete</i></button>
+          <button onclick="editTask(${task.id})" class="b_change"><i>edit</i></button>
+          <button onclick="archive(${task.id})" class="b_archive"><i>archive</i></button>
+      </article>`;
     } else if (task.prio == 0 && task.archiviert == 0) {
-      todoList.innerHTML += `<li class="item" draggable="true" id="li${task.id}"><input type="checkbox" name="prioCheck${task.id}" onClick="togglePrio(${task.id})" id="prioCheck${task.id}">
-        <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
-        <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
-        <button onclick="editTask(${task.id})" class="b_change">edit</button>
-        <button onclick="archive(${task.id})" class="b_archive">archive</button>
-      </li>`;
+      todoList.innerHTML += `
+      <article class="item border" draggable="true" id="li${task.id}">
+          <div class="field">
+            <input id="editInput${task.id}" type="text" value="${task.titel}" style="font-size: 2rem !important"></input>
+          </div>
+        <label class="checkbox icon">  
+          <input type="checkbox" name="prioCheck${task.id}" onClick="togglePrio(${task.id})" id="prioCheck${task.id}">
+            <span>
+              <i>trending_up</i>
+              <i>trending_down</i>
+            </span>
+        </label>
+          <button onclick="deleteTask(${task.id})" class="b_delete"><i>delete</i></button>
+          <button onclick="editTask(${task.id})" class="b_change"><i>edit</i></button>
+          <button onclick="archive(${task.id})" class="b_archive"><i>archive</i></button>
+      </article>`;
     } else {
-      todoArchive.innerHTML += `<li class="item" draggable="true" id="li${task.id}">
-      <input id="editInput${task.id}" type="text" value="${task.titel}"></input>
-      <button onclick="deleteTask(${task.id})" class="b_delete">delete</button>
-      <button onclick="editTask(${task.id})" class="b_change">edit</button>
-      <button onclick="archive(${task.id})" class="b_archive">archive</button>
-      </li>`;
+      todoArchive.innerHTML += `
+      <article class="item border" draggable="true" id="li${task.id}">
+          <div class="field">
+            <input id="editInput${task.id}" type="text" value="${task.titel}" style="font-size: 2rem !important"></input>
+          </div>
+          <button onclick="deleteTask(${task.id})" class="b_delete"><i>delete</i></button>
+          <button onclick="editTask(${task.id})" class="b_change"><i>edit</i></button>
+          <button onclick="archive(${task.id})" class="b_archive"><i>archive</i></button>
+      </article>`;
     }
   });
   tasks.data.forEach((aufgabe) => {
@@ -314,12 +280,11 @@ function generateEventlistener(taskId) {
   document
     .querySelector("#li" + taskId)
     .addEventListener("dragstart", (event) => {
-      document.getElementById("li"+taskId).classList.add("wobble");
+      document.getElementById("li" + taskId).classList.add("wobble");
       startDrag(taskId);
       console.log("Ich bin die TaskId" + taskId);
 
-
-      oldParentid = document.getElementById("li"+taskId).parentElement.id;
+      oldParentid = document.getElementById("li" + taskId).parentElement.id;
       console.log("old parent:" + oldParentid);
     });
 }
@@ -337,52 +302,45 @@ todoArchive.addEventListener("dragover", function (event) {
 todoList.addEventListener("dragover", function (event) {
   event.preventDefault();
   console.log("wir ziehen gerade über Todo bzw now mit der id " + currenTaskId);
-})
+});
 
 todoArchive.addEventListener("drop", function (event) {
   event.preventDefault();
-  if (currenTaskId !== null){
-    console.log("neuer old parent" + oldParentid)
-    if (oldParentid == "todo_archive"){
+  if (currenTaskId !== null) {
+    console.log("neuer old parent" + oldParentid);
+    if (oldParentid == "todo_archive") {
       console.log("NÖ!!");
-      document.getElementById("li"+currenTaskId).classList.remove("wobble");
-    }else{
-    archive(currenTaskId);
-    console.log(event.currentTarget.id);
-    console.log("Archiviert mit der id nummer" + currenTaskId);
-    document.getElementById("li"+currenTaskId).classList.remove("wobble");
-    };
-
+      document.getElementById("li" + currenTaskId).classList.remove("wobble");
+    } else {
+      archive(currenTaskId);
+      console.log(event.currentTarget.id);
+      console.log("Archiviert mit der id nummer" + currenTaskId);
+      document.getElementById("li" + currenTaskId).classList.remove("wobble");
+    }
   } else {
     console.log("die Taskid ist aktuell null");
-    document.getElementById("li"+currenTaskId).classList.remove("wobble");
-  };
+    document.getElementById("li" + currenTaskId).classList.remove("wobble");
+  }
 });
 
-todoList.addEventListener("drop", function(event){
+todoList.addEventListener("drop", function (event) {
   event.preventDefault();
   if (currenTaskId !== null) {
-    if(oldParentid == "todo_list"){
+    if (oldParentid == "todo_list") {
       console.log("NÖ!!");
-      document.getElementById("li"+currenTaskId).classList.remove("wobble");
-    }else{
-          archive(currenTaskId);
-    console.log(event.currentTarget.id);
-    console.log("Task wiederhergestellt mit der id " + currenTaskId);
-    document.getElementById("li"+currenTaskId).classList.remove("wobble");
+      document.getElementById("li" + currenTaskId).classList.remove("wobble");
+    } else {
+      archive(currenTaskId);
+      console.log(event.currentTarget.id);
+      console.log("Task wiederhergestellt mit der id " + currenTaskId);
+      document.getElementById("li" + currenTaskId).classList.remove("wobble");
     }
-
-  } else{
+  } else {
     console.log("Taskid ist nicht gleich null");
-    document.getElementById("li"+currenTaskId).classList.remove("wobble");
-  };
+    document.getElementById("li" + currenTaskId).classList.remove("wobble");
+  }
 });
-/* function DropTask(taskId){
-  todoArchive.addEventListener("drop", function(event){
-    event.preventDefault();
-archive(taskId);
-  })
-} */
+/* ---------------------------------------------------------------- */
 
 function editTask(tasknr) {
   fetch("http://192.168.178.43:8000/api/todos/" + tasknr, {
@@ -438,28 +396,40 @@ function archive(tasknr) {
   tasknr = 0;
   getTaskList();
 }
+/* --------------------------------- */
 
 function notify(msg, state) {
   console.log(msg);
 
   if (state == "warn") {
-    document.getElementById("notyBar").innerHTML = "";
-    document.getElementById(
-      "notyBar"
-    ).innerHTML = `<div style='color:white; background-color:orange'>Fehler:
-    ${msg}</div>`;
+    snackbar.innerHTML = "";
+    snackbar.innerHTML = `warning: ${msg}`;
+    snackbar.classList.add("tertiary", "active");
+    hideTimer("#notyBar", "3000", "tertiary,active");
   } else if (state == "critical") {
-    document.getElementById("notyBar").innerHTML = "";
-    document.getElementById(
-      "notyBar"
-    ).innerHTML = `<div style='color:white; background-color:red'>Fehler:
-    ${msg}</div>`;
+    snackbar.innerHTML = "";
+    snackbar.innerHTML = `error: ${msg}`;
+    snackbar.classList.add("error", "active");
+    hideTimer("#notyBar", "3000", "error,active");
   } else if (state == "info") {
-    document.getElementById("notyBar").innerHTML = "";
-    document.getElementById(
-      "notyBar"
-    ).innerHTML = `<div style='color:black; background-color:yellow'>Fehler:
-    ${msg}</div>`;
+    snackbar.innerHTML = "";
+    snackbar.innerHTML = `information: ${msg}`;
+    snackbar.classList.add("active");
+    hideTimer("#notyBar", "3000", "active");
   }
 }
 /* --------------------------------- */
+//CSS
+function hidden_sidebar(id) {
+  document.querySelector(id).classList.toggle("active");
+}
+
+function hideTimer(id, timeInMs, removeClasses) {
+  let classes = removeClasses.split(",");
+  console.log(classes);
+  setTimeout(() => {
+    for (let index = 0; index <= classes.length; index++) {
+      document.querySelector(id).classList.remove(classes[index]);
+    }
+  }, timeInMs);
+}

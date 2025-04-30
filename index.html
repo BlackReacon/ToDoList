@@ -3,19 +3,200 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+    <!--  <link rel="stylesheet" href="style.css" /> -->
+    <link href="./node_modules/beercss/dist/cdn/beer.css" rel="stylesheet" />
+    <script
+      type="module"
+      src="./node_modules/beercss/dist/cdn/beer.js"
+    ></script>
+    <script
+      type="module"
+      src="./node_modules/material-dynamic-colors/dist/cdn/material-dynamic-colors.min.js"
+    ></script>
     <title>ToDo List</title>
   </head>
-  <body>
-    <section id="notyBar">
-      <!-- Notifications -->
-    </section>
-    <section id="hero">
-      <h1>My ToDo list</h1>
-    </section>
+
+  <body style="min-height: 100vh; padding-bottom: 80px;">
+    <!-- notifications -->
+    <section id="notyBar" class="snackbar"></section>
+    <!-- header -->
+    <header class="tertiary-container">
+      <nav>
+        <button
+          class="circle transparent h_navbar"
+          onclick="hidden_sidebar('#sidebar')"
+        >
+          <i>menu</i>
+        </button>
+        <h1 class="max center-align">My ToDo list</h1>
+        <button class="circle transparent">
+          <img class="responsive" src="/src/icon/ToDoPickely.png" />
+        </button>
+      </nav>
+    </header>
+
+
+
     <!-- menu - add new to do -->
-    <button id="b_logout">logout</button>
-    <button id="b_registration">registration</button>
+    <form id="menu">
+      <input
+        type="text"
+        id="in_todoName"
+        placeholder="What is your to do?"
+        required
+      />
+      <button id="b_addTodo">confirm</button>
+    </form>
+    <!-- to do list -->
+    <section id="mytodo">
+      <article class="secondary-container center-align">
+      <h2>Tasks</h2>
+      <ul id="todo_list" class="todo" style="padding: 0"></ul>
+    </article>
+      <!-- archive -->
+      <article class="center-align">
+      <h2>Archive</h2>
+      <ul id="todo_archive" class="container" style="padding: 0"></ul>
+    </article>
+    </section>
+
+    <!-- Footer -->
+    <footer class="tertiary-container" style="position:absolute; bottom: 0; width: 100%">
+      <nav>
+        <button class="circle transparent">
+          <i>check_box</i>
+        </button>
+        <button class="circle transparent">
+          <i>brush</i>
+        </button>
+        <button class="circle transparent">
+          <i>mic</i>
+        </button>
+        <button class="circle transparent">
+          <i>image</i>
+        </button>
+        <div class="max"></div>
+        <button class="square round extra tertiary">
+          <i>add</i>
+        </button>
+      </nav>
+    </footer>
+
+    <!-- Sidebar -->
+    <nav class="overlay drawer left" id="sidebar">
+      <header>
+        <nav>
+          <button
+            class="circle transparent h_navbar"
+            onclick="hidden_sidebar('#sidebar')"
+          >
+            <i>menu</i>
+          </button>
+          <h6>Title</h6>
+        </nav>
+      </header>
+      <a>
+        <!-- button for logout user -->
+        <i>logout</i>
+        <span id="b_logout" class="max">Logout</span>
+      </a>
+      <!-- button for login -->
+      <a>
+        <i>login</i>
+        <span
+          id="b_login"
+          class="max"
+          onclick="hidden_sidebar('#signin'), hidden_sidebar('#log_dialog')"
+          >Login</span
+        >
+      </a>
+          <!-- button for registration -->
+          <a>
+            <i>app_registration</i>
+            <span
+              id="b_registration"
+              class="max"
+              onclick="hidden_sidebar('#regist'), hidden_sidebar('#reg_dialog')"
+              >Registration</span
+            >
+          </a>
+      <hr />
+      <a>
+        <i>inbox</i>
+        <span class="max">Inbox</span>
+        <b>24</b>
+      </a>
+      <a>
+        <i>send</i>
+        <span>Outbox</span>
+      </a>
+      <a>
+        <i>favorite</i>
+        <span>favorities</span>
+      </a>
+      <a>
+        <i>delete</i>
+        <span>Trash</span>
+      </a>
+      <hr />
+      <label>Labels</label>
+      <a>
+        <i>fiber_manual_record</i>
+        <span>Label</span>
+      </a>
+      <a>
+        <i>change_history</i>
+        <span>Label</span>
+      </a>
+      <a>
+        <i>stop</i>
+        <span>Label</span>
+      </a>
+    </nav>
+
+    <!-- dialog login -->
+    <div class="overlay blur" id="signin">
+      <dialog id="log_dialog">
+        <h5>Please login</h5>
+        <div class="field round fill small">
+          <input type="email" id="l_email" />
+          <span class="helper">Email</span>
+        </div>
+        <div class="field round fill small">
+          <input type="password" id="l_password"/>
+          <span class="helper">Password</span>
+        </div>
+        <nav class="right-align no-space">
+          <button class="transparent link close">Cancel</button>
+          <button class="transparent link" id="l_button">Confirm</button>
+        </nav>
+      </dialog>
+    </div>
+
+    <!-- dialog registration -->
+    <div class="overlay blur" id="regist">
+      <dialog id="reg_dialog">
+        <h5>Please sign in</h5>
+        <div class="field round fill small">
+          <input type="text" id="r_username" />
+          <span class="helper">Username</span>
+        </div>
+        <div class="field round fill small">
+          <input type="email" id="r_email" />
+          <span class="helper">Email</span>
+        </div>
+        <div class="field round fill small">
+          <input type="password" id="r_password"/>
+          <span class="helper">Password</span>
+        </div>
+        <nav class="right-align no-space">
+          <button class="transparent link close">Cancel</button>
+          <button class="transparent link" id="r_button">Confirm</button>
+        </nav>
+      </dialog>
+    </div>
+
+<!--     <button id="b_registration">registration</button>
     <div class="modal" id="registrat">
       <div class="content">
         <form id="registration">
@@ -44,45 +225,8 @@
           <button id="r_button" class="btn_ok">OK</button>
         </form>
       </div>
-    </div>
-    <button id="b_login">login</button>
-    <div class="modal" id="signin">
-      <div class="content">
-        <form id="login">
-          <span class="close">&times;</span>
-          <input
-            id="l_email"
-            class="username"
-            type="text"
-            placeholder="email"
-          />
-          <input
-            id="l_password"
-            class="password"
-            type="text"
-            placeholder="password"
-          />
-          <button id="l_button" class="btn_ok">OK</button>
-        </form>
-      </div>
-    </div>
-
-    <form id="menu">
-      <input
-        type="text"
-        id="in_todoName"
-        placeholder="What is your to do?"
-        required
-      />
-      <button id="b_addTodo">confirm</button>
-    </form>
-    <!-- to do list -->
-    <section id="mytodo">
-      <h2>now</h2>
-      <ul id="todo_list" class="todo"></ul>
-      <h2>archive</h2>
-      <ul id="todo_archive" class="container"></ul>
-    </section>
+    </div> -->
   </body>
+
   <script src="script.js"></script>
 </html>
